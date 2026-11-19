@@ -1,102 +1,94 @@
-🧠 Autism Adult Data – Machine Learning Classification
+# 🧩 Autism Screening Adult Data — Analysis & Explorer
 
-A Machine Learning project focused on analyzing and predicting Autism Spectrum Disorder (ASD) in adults using structured behavioral screening data.
+Data analysis of the **Autism Screening Adult** dataset (UCI Machine Learning Repository, 704 adults): data
+cleaning, exploratory analysis, classification models, and an interactive **Streamlit** dashboard.
 
-This project demonstrates how data science and classification models can support early detection of autism-related patterns in adults.
+> **Not a diagnostic tool.** The AQ-10 is a short screening questionnaire. Only a qualified clinician can assess autism.
 
-📌 Project Overview
+## 📊 Dataset
 
-Autism Spectrum Disorder (ASD) screening data contains responses to behavioral questions and demographic features.
-In this project, we:
+Each row is one respondent:
 
-Analyze adult autism screening data
-Perform data preprocessing and cleaning
-Explore feature relationships
-Build classification models to predict ASD cases
-Evaluate model performance using standard metrics
+- `A1_Score` … `A10_Score` — the ten AQ-10 screening answers, scored 0/1
+- `result` — the AQ-10 score (0–10)
+- demographics: age, gender, ethnicity, born with jaundice, family member with autism, country of residence,
+  who completed the test
+- `class/ASD` — the screening outcome (YES / NO)
 
-The dataset is widely used in research for AI-based early screening systems for autism detection.
+## 🔍 Key finding: the label is rule-based
 
-🧠 Key Concepts Covered
-Data cleaning & preprocessing
-Handling categorical & numerical features
-Exploratory Data Analysis (EDA)
-Feature encoding
-Binary classification (ASD / No ASD)
-Model evaluation (accuracy, confusion matrix, etc.)
-📊 Dataset Overview
+Checked on all 704 rows:
 
-The dataset includes behavioral and demographic features such as:
+| Check | Result |
+|---|---|
+| `result` equals the sum of `A1`…`A10` | 100% of rows |
+| `class/ASD` is `YES` exactly when `result ≥ 7` (the AQ-10 cut-off) | 100% of rows |
 
-🧠 AQ-based screening questions (A1–A10 scores)
-👤 Age & gender
-🌍 Ethnicity
-🏥 Medical history (e.g., jaundice, family history)
-📍 Country of residence
-📊 Screening result (target variable)
+So any model given `result` (or the ten item scores) simply rediscovers the cut-off, which is why the notebook's
+Logistic Regression, Decision Tree, Random Forest and XGBoost all reach 100%. Without the screening answers,
+demographics alone predict the outcome poorly:
 
-📌 Dataset Source:
-Autism Screening Adult Dataset (UCI Machine Learning Repository)
+| Model (no AQ-10 answers or score) | F1, 5-fold CV |
+|---|---|
+| Logistic Regression | 0.28 ± 0.06 |
+| Random Forest | 0.38 ± 0.06 |
 
-🤖 Machine Learning Models Used
+For this reason the Streamlit app is an exploration dashboard, not a predictor.
 
-Common models used for this dataset include:
+## 🚀 Features
 
-Logistic Regression
-Decision Tree Classifier
-Random Forest
-Support Vector Machine (SVM)
-K-Nearest Neighbors (KNN)
-🛠️ Technologies Used
-Python 🐍
-Pandas
-NumPy
-Scikit-learn
-Matplotlib
-Seaborn
-Jupyter Notebook
-📂 Project Structure
+- `assigment clean data.ipynb` — data cleaning walkthrough
+- `autism_modeling.ipynb` — cleaning, EDA (Matplotlib, Seaborn, Plotly) and classification models
+- `app.py` — Streamlit dashboard:
+  - filters by gender, age and who completed the test
+  - AQ-10 score distribution and per-question rates by screening outcome
+  - screening-outcome rates by gender, jaundice, family history, ethnicity and country
+  - the rule-based-label checks and demographic-only model scores, computed live
+  - data table with CSV download
+
+## 🛠️ Tech Stack
+
+Python · pandas · scikit-learn · XGBoost · Matplotlib · Seaborn · Plotly · Altair · Streamlit · Jupyter
+
+## 📂 Project Structure
+
+```
 Autism-Adult-Data/
-│
-├── autism_adult_data.ipynb   # Main notebook
-├── data/                    # Dataset files
-├── visuals/                 # Graphs & plots
-└── README.md
-🚀 How to Run
-1. Clone repository
+├── Autism-Adult-Data.csv          # Dataset (no header row)
+├── assigment clean data.ipynb     # Data cleaning notebook
+├── autism_modeling.ipynb          # EDA + classification notebook
+├── autism_data.py                 # Loading, cleaning and analysis helpers
+├── app.py                         # Streamlit dashboard
+├── requirements.txt
+└── .streamlit/config.toml
+```
+
+## 📦 Installation
+
+```bash
 git clone https://github.com/amirafarhan/Autism-Adult-Data.git
-2. Install dependencies
-pip install pandas numpy matplotlib seaborn scikit-learn
-3. Run Jupyter Notebook
-jupyter notebook
-4. Open file
-autism_adult_data.ipynb
-📈 Results
+cd Autism-Adult-Data
+python -m venv venv
+# Windows: venv\Scripts\activate    Linux/Mac: source venv/bin/activate
+pip install -r requirements.txt
+```
 
-The model learns patterns such as:
+## ▶️ Run
 
-Behavioral scores strongly influence prediction
-Certain demographic features improve classification
-ML models can help support early screening systems
-🔮 Future Improvements
-Use ensemble models (XGBoost, LightGBM)
-Handle missing data more effectively
-Add feature importance analysis
-Deploy as a web-based screening tool (Streamlit)
-Integrate explainable AI (SHAP)
-💡 Key Insight
+Streamlit dashboard (opens http://localhost:8501):
 
-This project shows how machine learning can assist in early detection support systems for healthcare-related conditions, helping improve screening efficiency.
+```bash
+streamlit run app.py
+```
 
-👨‍💻 Author
+The notebooks need a few extra packages:
 
-Amira Farhan
-Machine Learning & Computer Vision Engineer
+```bash
+pip install jupyter matplotlib seaborn plotly folium xgboost
+```
 
-⭐ Support
+Then run `jupyter notebook`.
 
-If you like this project:
+## 👩‍💻 Author
 
-⭐ Star the repository
-🍴 Fork it
-🚀 Share it
+Amira Farhan — Machine Learning & Computer Vision Engineer
